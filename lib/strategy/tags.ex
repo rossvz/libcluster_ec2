@@ -149,7 +149,7 @@ defmodule ClusterEC2.Strategy.Tags do
               |> ip_to_nodename.(app_prefix)
 
             nodes = MapSet.new(resp)
-            Logger.debug("Found nodes: #{nodes}")
+            Logger.debug("Found nodes: #{inspect(nodes)}")
 
             {:ok, nodes}
 
