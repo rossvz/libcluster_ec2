@@ -38,6 +38,7 @@ defmodule ClusterEC2.Strategy.Tags do
   import SweetXml, only: [sigil_x: 2]
 
   alias Cluster.Strategy.State
+  require Logger
 
   @default_polling_interval 5_000
 
@@ -138,7 +139,6 @@ defmodule ClusterEC2.Strategy.Tags do
       tag_name != nil and tag_value != nil and app_prefix != nil and instance_id != "" and region != "" ->
         params = [filters: ["tag:#{tag_name}": fetch_tag_value(tag_name, tag_value), "instance-state-name": "running"]]
         request = ExAws.EC2.describe_instances(params)
-        require Logger
         if show_debug?, do: Logger.debug("#{inspect(request)}")
 
         case ExAws.request(request, region: region) do
