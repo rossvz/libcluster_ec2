@@ -86,9 +86,10 @@ defmodule ClusterEC2.Strategy.Tags do
   defp load(%State{topology: topology, connect: connect, disconnect: disconnect, list_nodes: list_nodes} = state) do
     case get_nodes(state) do
       {:ok, new_nodelist} ->
-        removed = MapSet.difference(state.meta, new_nodelist)
+        connected = Node.list() |> MapSet.new() |> MapSet.union(state.meta)
+        removed = MapSet.difference(connected, new_nodelist)
 
-        Logger.debug("Disconnecting from #{inspect(removed)}")
+        Logger.debug("Currently connected to #{inspect(connected)}. Disconnecting from #{inspect(removed)}")
 
         new_nodelist =
           case Cluster.Strategy.disconnect_nodes(topology, disconnect, list_nodes, MapSet.to_list(removed)) do
