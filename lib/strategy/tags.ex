@@ -87,6 +87,8 @@ defmodule ClusterEC2.Strategy.Tags do
       {:ok, new_nodelist} ->
         removed = MapSet.difference(state.meta, new_nodelist)
 
+        Logger.debug("Disconnecting from #{inspect(removed)}")
+
         new_nodelist =
           case Cluster.Strategy.disconnect_nodes(topology, disconnect, list_nodes, MapSet.to_list(removed)) do
             :ok ->
@@ -98,6 +100,8 @@ defmodule ClusterEC2.Strategy.Tags do
                 MapSet.put(acc, n)
               end)
           end
+
+        Logger.debug("Connecting to #{inspect(new_nodelist)}")
 
         new_nodelist =
           case Cluster.Strategy.connect_nodes(topology, connect, list_nodes, MapSet.to_list(new_nodelist)) do
@@ -144,7 +148,10 @@ defmodule ClusterEC2.Strategy.Tags do
               |> SweetXml.xpath(ip_xpath(Keyword.get(config, :ip_type, :private)))
               |> ip_to_nodename.(app_prefix)
 
-            {:ok, MapSet.new(resp)}
+            nodes = MapSet.new(resp)
+            Logger.debug("Found nodes: #{nodes}")
+
+            {:ok, nodes}
 
           _ ->
             {:error, []}
