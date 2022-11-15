@@ -97,6 +97,7 @@ defmodule ClusterEC2.Strategy.Tags do
               new_nodelist
 
             {:error, bad_nodes} ->
+              Logger.debug("Could not disconnect nodes #{inspect(bad_nodes)}")
               # Add back the nodes which should have been removed, but which couldn't be for some reason
               Enum.reduce(bad_nodes, new_nodelist, fn {n, _}, acc ->
                 MapSet.put(acc, n)
@@ -112,6 +113,8 @@ defmodule ClusterEC2.Strategy.Tags do
 
             {:error, bad_nodes} ->
               # Remove the nodes which should have been added, but couldn't be for some reason
+              Logger.debug("Could not connect to nodes #{inspect(bad_nodes)}")
+
               Enum.reduce(bad_nodes, new_nodelist, fn {n, _}, acc ->
                 MapSet.delete(acc, n)
               end)
